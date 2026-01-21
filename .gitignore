@@ -1,0 +1,16 @@
+# Hugo build
+/public/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+
+# Hugo cache
+/resources/_gen/
+
+# Logs
+*.log
