@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  {{ partial "head.html" . }}
+</head>
+
+<body>
+  {{ partial "header.html" . }}
+
+  <main class="page">
+    <section class="article-card" style="text-align:center; padding:60px 20px;">
+      
+      <h1 style="font-size:42px; margin-bottom:16px;">404</h1>
+
+      <p class="muted" style="margin-bottom:28px;">
+        这个页面不存在，或者已经被移动。
+      </p>
+
+      <div style="display:flex; gap:12px; justify-content:center;">
+        <a class="btn primary" href="{{ "/" | relURL }}">回到首页</a>
+        <a class="btn" href="{{ "/calculator/" | relURL }}">去算一算</a>
+      </div>
+
+    </section>
+  </main>
+
+  {{ partial "footer.html" . }}
+</body>
+</html>

@@ -1,0 +1,36 @@
+{{ define "main" }}
+<main class="container">
+
+  <header class="page-header">
+    <h1>{{ .Title }}</h1>
+    {{ with .Params.description }}<p class="muted">{{ . }}</p>{{ end }}
+  </header>
+
+  {{ with .Content }}
+    <div class="prose">{{ . }}</div>
+  {{ end }}
+
+  {{ $pages := .RegularPages.ByWeight.ByDate.Reverse }}
+
+  <section class="section">
+    <div class="list">
+      {{ range $pages }}
+        <a class="list-item list-item-compact" href="{{ .RelPermalink }}">
+          <div class="li-title">{{ .Title }}</div>
+
+          <div class="li-meta muted">
+            {{ with .Date }}{{ .Format "2006-01-02" }}{{ end }}
+            {{ with .Params.tags }} · {{ delimit . " / " }}{{ end }}
+          </div>
+
+          {{ $sum := (or .Params.summary .Params.description .Summary) }}
+          {{ with $sum }}
+            <div class="li-summary muted">{{ . | plainify }}</div>
+          {{ end }}
+        </a>
+      {{ end }}
+    </div>
+  </section>
+
+</main>
+{{ end }}

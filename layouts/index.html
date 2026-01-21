@@ -1,0 +1,146 @@
+{{ define "main" }}
+<main class="home">
+  <div class="container">
+    <section class="hero">
+      <h1 class="hero-title">把时间变成你的资产</h1>
+      <p class="hero-subtitle muted">一次算清「本金、定投、年化、期限」的长期结果。</p>
+      <div class="hero-actions">
+        <a class="btn primary" href="{{ "/calculator/" | relURL }}">开始计算</a>
+        <a class="btn" href="{{ "/stories/" | relURL }}">读复利故事</a>
+      </div>
+    </section>
+
+    <section class="grid">
+      <div class="card">
+        <h3>适合谁</h3>
+        <p class="muted">适合想从「月光」走向「可控」的普通人：从小额开始，建立长期习惯。</p>
+      </div>
+      <div class="card">
+        <h3>你会看到什么</h3>
+        <p class="muted">总投入、期末金额、总收益，以及分年明细表。后续可扩展曲线图与分享链接。</p>
+      </div>
+    </section>
+
+    {{/* ===== 近期故事 ===== */}}
+    <section class="section">
+      <div class="section-head">
+        <h2>近期故事</h2>
+        <a class="muted" href="{{ "/stories/" | relURL }}">更多 →</a>
+      </div>
+
+      <div class="list">
+        {{ $stories := (where site.RegularPages "Section" "stories").ByDate.Reverse }}
+        {{ range first 6 $stories }}
+          <a class="list-item list-item-compact" href="{{ .RelPermalink }}">
+            <div class="li-title">{{ .Title }}</div>
+
+            <div class="li-meta muted">
+              {{ with .Date }}{{ .Format "2006-01-02" }}{{ end }}
+              {{ with .Params.tags }} · {{ delimit . " / " }}{{ end }}
+            </div>
+
+            {{/* 摘要：summary > description > .Summary */}}
+            {{ $sum := "" }}
+            {{ with .Params.summary }}
+              {{ $sum = . }}
+            {{ else }}
+              {{ with .Params.description }}
+                {{ $sum = . }}
+              {{ else }}
+                {{ with .Summary }}
+                  {{ $sum = . }}
+                {{ end }}
+              {{ end }}
+            {{ end }}
+
+            {{ if $sum }}
+              <div class="li-summary muted">{{ $sum | plainify | htmlUnescape | truncate 80 }}</div>
+            {{ end }}
+          </a>
+        {{ end }}
+      </div>
+    </section>
+
+    {{/* ===== 近期书单 ===== */}}
+    <section class="section">
+      <div class="section-head">
+        <h2>近期书单</h2>
+        <a class="muted" href="{{ "/lists/" | relURL }}">更多 →</a>
+      </div>
+
+      <div class="list">
+        {{ $lists := (where site.RegularPages "Section" "lists").ByDate.Reverse }}
+        {{ range first 6 $lists }}
+          <a class="list-item list-item-compact" href="{{ .RelPermalink }}">
+            <div class="li-title">{{ .Title }}</div>
+
+            <div class="li-meta muted">
+              {{ with .Date }}{{ .Format "2006-01-02" }}{{ end }}
+              {{ with .Params.tags }} · {{ delimit . " / " }}{{ end }}
+            </div>
+
+            {{/* 摘要：summary > description > .Summary */}}
+            {{ $sum := "" }}
+            {{ with .Params.summary }}
+              {{ $sum = . }}
+            {{ else }}
+              {{ with .Params.description }}
+                {{ $sum = . }}
+              {{ else }}
+                {{ with .Summary }}
+                  {{ $sum = . }}
+                {{ end }}
+              {{ end }}
+            {{ end }}
+
+            {{ if $sum }}
+              <div class="li-summary muted">{{ $sum | plainify | htmlUnescape | truncate 80 }}</div>
+            {{ end }}
+          </a>
+        {{ end }}
+      </div>
+    </section>
+
+    {{/* ===== 近期文章 ===== */}}
+    <section class="section">
+      <div class="section-head">
+        <h2>近期文章</h2>
+        <a class="muted" href="{{ "/posts/" | relURL }}">更多 →</a>
+      </div>
+
+      <div class="list">
+        {{ $posts := (where site.RegularPages "Section" "posts").ByDate.Reverse }}
+        {{ range first 6 $posts }}
+          <a class="list-item list-item-compact" href="{{ .RelPermalink }}">
+            <div class="li-title">{{ .Title }}</div>
+
+            <div class="li-meta muted">
+              {{ with .Date }}{{ .Format "2006-01-02" }}{{ end }}
+              {{ with .Params.tags }} · {{ delimit . " / " }}{{ end }}
+            </div>
+
+            {{/* 摘要：summary > description > .Summary */}}
+            {{ $sum := "" }}
+            {{ with .Params.summary }}
+              {{ $sum = . }}
+            {{ else }}
+              {{ with .Params.description }}
+                {{ $sum = . }}
+              {{ else }}
+                {{ with .Summary }}
+                  {{ $sum = . }}
+                {{ end }}
+              {{ end }}
+            {{ end }}
+
+            {{ if $sum }}
+              <div class="li-summary muted">{{ $sum | plainify | htmlUnescape | truncate 80 }}</div>
+            {{ end }}
+          </a>
+        {{ end }}
+      </div>
+    </section>
+
+  </div>
+</main>
+{{ end }}

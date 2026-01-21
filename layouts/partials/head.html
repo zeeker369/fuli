@@ -1,0 +1,41 @@
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<title>
+{{- if .IsHome -}}
+  {{ .Site.Title }}
+{{- else -}}
+  {{- $site := .Site.Title -}}
+  {{- $title := .Title -}}
+
+  {{- /* 书籍页：书名 - 作者 - 站点 */ -}}
+  {{- if and (eq .Section "books") (.Params.author) -}}
+    {{ $title }} - {{ .Params.author }} - {{ $site }}
+
+  {{- /* 书单页：书单名 - 站点 */ -}}
+  {{- else if eq .Section "lists" -}}
+    {{ $title }} - {{ $site }}
+
+  {{- /* 其它内容页 */ -}}
+  {{- else -}}
+    {{ $title }} - {{ $site }}
+  {{- end -}}
+{{- end -}}
+</title>
+
+
+<meta name="description" content="{{ with .Params.description }}{{ . }}{{ else }}{{ .Site.Params.siteDescription }}{{ end }}" />
+<meta property="og:title" content="{{ if .IsHome }}{{ .Site.Title }}{{ else }}{{ .Title }} · {{ .Site.Title }}{{ end }}">
+<meta property="og:description" content="{{ with .Params.description }}{{ . }}{{ else }}{{ .Site.Params.siteDescription }}{{ end }}">
+<meta property="og:type" content="{{ if .IsHome }}website{{ else }}article{{ end }}">
+<meta property="og:url" content="{{ .Permalink }}">
+
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="{{ if .IsHome }}{{ .Site.Title }}{{ else }}{{ .Title }} · {{ .Site.Title }}{{ end }}">
+<meta name="twitter:description" content="{{ with .Params.description }}{{ . }}{{ else }}{{ .Site.Params.siteDescription }}{{ end }}">
+
+<link rel="canonical" href="{{ .Permalink }}" />
+
+{{/* 本地预览与上线都稳定：使用站内路径 relURL */}}
+<link rel="stylesheet" href="{{ "/css/main.css" | relURL }}?v={{ now.Unix }}">

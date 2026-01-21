@@ -1,0 +1,178 @@
+{{ define "main" }}
+<main class="container">
+  <header class="hero">
+    <h1 class="hero-title">{{ .Title | default "定投收益试算" }}</h1>
+    {{ with .Params.description }}
+      <p class="hero-subtitle muted">{{ . }}</p>
+    {{ else }}
+      <p class="hero-subtitle muted">一次算清「本金、定投、年化、期限」的长期结果。</p>
+    {{ end }}
+  </header>
+
+  <section class="card calc" id="calc">
+    <div class="calc-row">
+      <label for="principal">初始本金（元）</label>
+      <input id="principal" type="number" inputmode="decimal" min="0" step="100" value="10000">
+    </div>
+
+    <div class="calc-row">
+      <label for="monthly">每月定投（元）</label>
+      <input id="monthly" type="number" inputmode="decimal" min="0" step="100" value="1000">
+    </div>
+
+    <div class="calc-row">
+      <label for="rate">年化收益率（%）</label>
+      <input id="rate" type="number" inputmode="decimal" step="0.1" value="8">
+    </div>
+
+    <div class="calc-row">
+      <label for="years">期限（年）</label>
+      <input id="years" type="number" inputmode="numeric" min="1" step="1" value="10">
+    </div>
+
+    <div class="calc-actions">
+      <button class="btn primary" id="btnCalc" type="button">计算</button>
+      <button class="btn" id="btnReset" type="button">重置</button>
+    </div>
+  </section>
+
+  <section class="result">
+    <div class="kpis">
+      <div class="kpi">
+        <div class="muted">总投入</div>
+        <div class="kpi-value" id="kpiInvested">-</div>
+      </div>
+      <div class="kpi">
+        <div class="muted">期末金额</div>
+        <div class="kpi-value" id="kpiFinal">-</div>
+      </div>
+      <div class="kpi">
+        <div class="muted">总收益</div>
+        <div class="kpi-value" id="kpiGain">-</div>
+      </div>
+    </div>
+
+    <div class="table-wrap" style="margin-top:12px;">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>年份</th>
+            <th>期末金额</th>
+            <th>累计投入</th>
+            <th>累计收益</th>
+          </tr>
+        </thead>
+        <tbody id="rows">
+          <!-- JS render -->
+        </tbody>
+      </table>
+    </div>
+
+    <p class="note muted" style="margin-top:10px;">
+      说明：本计算为学习与测算参考，年化为假设值；实际收益会受波动、费用、税收等影响。
+    </p>
+  </section>
+</main>
+
+<script>
+(function(){
+  const $ = (id) => document.getElementById(id);
+
+  const elPrincipal = $("principal");
+  const elMonthly   = $("monthly");
+  const elRate      = $("rate");
+  const elYears     = $("years");
+
+  const elInvested  = $("kpiInvested");
+  const elFinal     = $("kpiFinal");
+  const elGain      = $("kpiGain");
+  const elRows      = $("rows");
+
+  const btnCalc     = $("btnCalc");
+  const btnReset    = $("btnReset");
+
+  function n(v){
+    const x = Number(v);
+    return Number.isFinite(x) ? x : 0;
+  }
+
+  function fmtMoney(x){
+    // 用中文常见格式：千分位 + 两位小数（你也可以改成整数）
+    return x.toLocaleString("zh-CN", {maximumFractionDigits: 2});
+  }
+
+  // 计算模型：月复利；每月先增长后投入（或先投入后增长差别很小）
+  function calc(principal, monthly, annualRatePct, years){
+    const r = n(annualRatePct) / 100;
+    const m = r / 12;
+    const months = Math.max(0, Math.floor(n(years) * 12));
+
+    let balance = Math.max(0, n(principal));
+    let invested = Math.max(0, n(principal));
+
+    const yearly = [];
+    for(let i=1; i<=months; i++){
+      // 增长
+      balance = balance * (1 + m);
+      // 定投
+      if(monthly > 0){
+        balance += monthly;
+        invested += monthly;
+      }
+
+      if(i % 12 === 0){
+        const yearIndex = i / 12;
+        const gain = balance - invested;
+        yearly.push({
+          year: yearIndex,
+          balance,
+          invested,
+          gain
+        });
+      }
+    }
+
+    return { balance, invested, gain: balance - invested, yearly };
+  }
+
+  function render(){
+    const principal = n(elPrincipal.value);
+    const monthly   = n(elMonthly.value);
+    const rate      = n(elRate.value);
+    const years     = Math.max(1, Math.floor(n(elYears.value)));
+
+    const out = calc(principal, monthly, rate, years);
+
+    elInvested.textContent = fmtMoney(out.invested);
+    elFinal.textContent    = fmtMoney(out.balance);
+    elGain.textContent     = fmtMoney(out.gain);
+
+    elRows.innerHTML = out.yearly.map(r => `
+      <tr>
+        <td>${r.year}</td>
+        <td>${fmtMoney(r.balance)}</td>
+        <td>${fmtMoney(r.invested)}</td>
+        <td>${fmtMoney(r.gain)}</td>
+      </tr>
+    `).join("");
+  }
+
+  btnCalc.addEventListener("click", render);
+
+  btnReset.addEventListener("click", () => {
+    elPrincipal.value = 10000;
+    elMonthly.value = 1000;
+    elRate.value = 8;
+    elYears.value = 10;
+    elInvested.textContent = "-";
+    elFinal.textContent = "-";
+    elGain.textContent = "-";
+    elRows.innerHTML = "";
+  });
+
+  // 首次自动渲染一次（避免你以为没生效）
+  // 如果你希望必须点“计算”，把下一行注释掉即可
+  render();
+})();
+</script>
+{{ end }}

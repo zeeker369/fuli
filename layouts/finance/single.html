@@ -1,0 +1,116 @@
+{{ define "main" }}
+<article class="page">
+
+  <nav class="breadcrumb" aria-label="breadcrumb">
+    <a href="{{ "/" | relURL }}">首页</a>
+    <span class="sep">›</span>
+
+    {{/* ✅ 兼容：你的栏目如果已经从 finance 改成 lists，就跳 /lists/；否则跳 /finance/ */}}
+    {{ if eq .Section "lists" }}
+      <a href="{{ "/lists/" | relURL }}">复利书单</a>
+    {{ else }}
+      <a href="{{ "/finance/" | relURL }}">复利书单</a>
+    {{ end }}
+
+    <span class="sep">›</span>
+    <span class="current">{{ .Title }}</span>
+  </nav>
+
+  <section class="article-card">
+    <header class="page-header">
+      <h1>{{ .Title }}</h1>
+
+      <div class="muted meta">
+        {{ with .Date }}{{ .Format "2006-01-02" }}{{ end }}
+        · 阅读 {{ .ReadingTime }} 分钟
+        {{ with .Params.tags }} · {{ delimit . " / " }}{{ end }}
+      </div>
+
+      {{ with .Params.description }}
+        <p class="muted">{{ . }}</p>
+      {{ end }}
+    </header>
+
+    {{ if .Content }}
+      <div class="prose">
+        {{ .Content }}
+      </div>
+    {{ end }}
+
+    {{/* ===== 书单：从 .Params.books 调取 /books/ 下的页面 =====
+        ✅ 兼容两种写法：
+        1) YAML 数组：books: ["stoner","huozhe"]
+        2) 逗号字符串：books: "stoner, huozhe"
+    */}}
+
+    {{ $raw := .Params.books }}
+    {{ $slugs := slice }}
+
+    {{ if $raw }}
+      {{ if reflect.IsSlice $raw }}
+        {{ $slugs = $raw }}
+      {{ else }}
+        {{ $slugs = split (printf "%v" $raw) "," }}
+      {{ end }}
+    {{ end }}
+
+    {{ if gt (len $slugs) 0 }}
+      <section class="section booklist">
+        <h2>推荐书单（从认知到行动）</h2>
+
+        <div class="booklist-grid">
+          {{ range $slugs }}
+            {{ $slug := trim (printf "%v" .) " " }}
+            {{ if $slug }}
+              {{ $p := site.GetPage (printf "books/%s" $slug) }}
+
+              {{ if $p }}
+                <a class="book-item" href="{{ $p.RelPermalink }}">
+                  <div class="book-item-cover">
+                    {{ with $p.Params.cover }}
+                      <img src="{{ . | relURL }}" alt="{{ $p.Title }}">
+                    {{ else }}
+                      <div class="book-item-ph">暂无封面</div>
+                    {{ end }}
+                  </div>
+
+                  <div class="book-item-body">
+                    <div class="book-item-title">{{ $p.Title }}</div>
+
+                    <div class="book-item-meta muted">
+                      {{ with $p.Params.author }}作者：{{ . }}{{ end }}
+                      {{ with $p.Params.tags }}{{ if $p.Params.author }} · {{ end }}{{ delimit . " / " }}{{ end }}
+                    </div>
+
+                    {{ with (or $p.Params.summary $p.Params.description) }}
+                      <div class="book-item-desc muted">{{ . }}</div>
+                    {{ end }}
+                  </div>
+                </a>
+              {{ else }}
+                <div class="book-item missing">
+                  <div class="book-item-body">
+                    <div class="book-item-title">未找到书籍：{{ $slug }}</div>
+                    <div class="muted">请确认存在 content/books/{{ $slug }}.md</div>
+                  </div>
+                </div>
+              {{ end }}
+            {{ end }}
+          {{ end }}
+        </div>
+      </section>
+    {{ else }}
+      <section class="section booklist">
+        <h2>推荐书单（从认知到行动）</h2>
+        <div class="muted" style="margin-top:8px;">
+          本页未配置 books。请在文章 front matter 里写：
+          <br>books: ["stoner","huozhe"]
+          <br>或：books: "stoner, huozhe"
+        </div>
+      </section>
+    {{ end }}
+
+  </section>
+
+</article>
+{{ end }}

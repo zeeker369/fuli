@@ -1,0 +1,25 @@
+baseURL = "/"
+languageCode = "zh-cn"
+title = "复利计算器"
+paginate = 12
+
+enableRobotsTXT = true
+canonifyURLs = false
+
+[params]
+  siteDescription = "移动端优先的复利计算器，支持定投与收益明细，并提供复利故事与文章。"
+  friendName = "乌乌和玄玄的文学书单"
+  friendURL = "https://wuwuxuanxuan.com"
+
+[taxonomies]
+  tag = "tags"
+  category = "categories"
+
+[markup]
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = true
+
+[sitemap]
+  changefreq = "weekly"
+  priority = 0.6

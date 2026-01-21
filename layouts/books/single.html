@@ -1,0 +1,55 @@
+{{ define "main" }}
+<article class="page">
+
+  <nav class="breadcrumb" aria-label="breadcrumb">
+    <a href="{{ "/" | relURL }}">首页</a>
+    <span class="sep">›</span>
+    <a href="{{ "/books/" | relURL }}">书籍</a>
+    <span class="sep">›</span>
+    <span class="current">{{ .Title }}</span>
+  </nav>
+
+  <section class="article-card book-card">
+
+    <header class="book-header">
+      <div class="book-head">
+
+        <div class="cover-wrap">
+          {{ with .Params.cover }}
+            <img class="title-cover" src="{{ . | relURL }}" alt="{{ $.Title }}">
+          {{ end }}
+        </div>
+
+        <div class="book-head-text">
+          <h1 class="book-h1">{{ .Title }}</h1>
+
+          {{ with .Params.author }}
+            <div class="book-meta muted">{{ . }}</div>
+          {{ end }}
+
+          {{ with .Params.summary }}
+            <p class="book-summary muted">{{ . }}</p>
+          {{ end }}
+
+          {{ with .Params.buy }}
+          <div class="book-actions">
+            {{ with .jd }}<a class="btn primary" href="{{ . }}" target="_blank" rel="noopener">京东购买</a>{{ end }}
+            {{ with .dd }}<a class="btn" href="{{ . }}" target="_blank" rel="noopener">当当</a>{{ end }}
+            {{ with .tb }}<a class="btn" href="{{ . }}" target="_blank" rel="noopener">淘宝/天猫</a>{{ end }}
+          </div>
+          {{ end }}
+
+        </div>
+      </div>
+    </header>
+
+    {{ if .Content }}
+    <div class="prose">
+      {{ .Content }}
+    </div>
+    {{ end }}
+
+  </section>
+
+</article>
+{{ end }}
